@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AB Nutri</title>
+<style>
+  :root{--bg:#0d0f12;--card:#14171a;--line:#23272d;--text:#e8ecf2;--muted:#9aa0a6;--accent:#f59e0b;--accent2:#f8b844}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#111418;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .brand{display:flex;align-items:center;gap:10px} .brand img{height:28px;display:block} .brand h1{margin:0;font-size:1.0rem;letter-spacing:.3px;color:var(--accent);font-weight:900}
+  .nav{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{border:1px solid #2a2f35;background:#0b0d0f;color:#e7ebf1;padding:8px 12px;border-radius:999px;font-weight:900;cursor:pointer}
+  .chip.active{background:linear-gradient(180deg,var(--accent2),var(--accent));color:#111;border-color:transparent}
+  main{max-width:1100px;margin:auto;padding:16px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent) border-box, var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:16px auto;box-shadow:0 14px 32px rgba(0,0,0,.3)}
+  h2{margin:0 0 10px;color:#ffd089;font-size:1.05rem}
+  label{display:block;margin:.35rem 0 .35rem;font-weight:800;color:#d7dce3}
+  input,select,button{font-size:15px} input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #20252a;background:#0b0d0f;color:#e7ebf1}
+  input:focus,select:focus{outline:none;border-color:#3a4046;box-shadow:0 0 0 3px rgba(245,158,11,.14)}
+  .grid{display:grid;gap:12px} @media(min-width:930px){.grid-3{grid-template-columns:1.2fr 1fr 1fr}.grid-2{grid-template-columns:1fr 1fr}.grid-4{grid-template-columns:repeat(4,1fr)}}
+  .btn{cursor:pointer;padding:12px 16px;border-radius:12px;border:1px solid #2a2e33;font-weight:900;letter-spacing:.2px}
+  .btn.primary{background:linear-gradient(180deg,var(--accent2),var(--accent));color:#111;border:none} .btn.secondary{background:#13161a;color:#e7ebf1} .btn.ghost{background:#0b0d0f;border:1px dashed #2a2f35;color:#cbd1d8}
+  .muted{color:var(--muted);font-size:12px}
+  .pillbar{display:flex;flex-wrap:wrap;gap:8px} .pill{padding:10px 14px;border-radius:999px;background:#0c0f12;border:1px solid #2a2f35;color:#e7ebf1;cursor:pointer;font-weight:800} .pill.active{background:linear-gradient(180deg,var(--accent2),var(--accent));color:#111;border:none}
+  table{width:100%;border-collapse:collapse} th,td{padding:10px;border-bottom:1px solid #242a30;text-align:center} th{background:#0b0d0f;color:#c9cfd6}
+  .summary{display:flex;gap:10px;flex-wrap:wrap} .badge{background:#0c0f12;border:1px solid #20252a;padding:12px 14px;border-radius:12px;font-weight:900;min-width:140px;text-align:center}
+  .row{display:flex;gap:10px;flex-wrap:wrap} .hidden{display:none} .topline{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .metaBox{display:flex;gap:10px;flex-wrap:wrap} .meta{background:#0c0f12;border:1px solid #20252a;padding:10px 12px;border-radius:12px;font-weight:900}
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);z-index:50} .modal.open{display:flex}
+  .modal-card{background:#14171a;border:1px solid #23272d;border-radius:16px;padding:16px;width:min(760px,95vw)}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px} .modal-title{margin:0;color:#ffd089} .close{background:#0b0d0f;border:1px solid #2a2f35;border-radius:10px;padding:6px 10px;color:#e7ebf1;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><img alt="AB Nutri" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAAhGVYSWZNTQAqAAAACAAFARIAAwAAAAEAAQAAARoABQAAAAEAAABKARsABQAAAAEAAABSASgAAwAAAAEAAgAAh2kABAAAAAEAAABaAAAAAAAAAEgAAAABAAAASAAAAAEAA6ABAAMAAAABAAEAAKACAAQAAAABAAAEAKADAAQAAAABAAAEAAAAAAAg54ceAAACw0lEQVR42u2VT0hUURTGv3PfezNpTjqok6ZDBP21RQkFJoS2rgiJJxZFWItaBS0qCvLNEwkybFUEEW1KsYbCcBlIQYFWRBJN2CKaxBbTzKSjo/PmvXtPqyJCRQmCYH7rj3vOd87HuUCBAgX+gJaqsyzrl9a2bWWapva7IJGoo+ZmKNu21T9t1LIs8TcOiRkI7zoRbGkIXQ+UBqtyuZnotSudN1sOHukBUVgpJZViBMvKvqzfsuFOx/kzY8xMRMTzPbhoN6ZpCiLw8W3fjqVS6VYAe6YzM5cbGxsDzNir64ZJQrTpht6Wc5xznz/FRy5a3duJaEGn2kLF2IIwb8T43LqGmp1VmduDH4xxvSiYVtILO3NuStf1aqGJcHFJSWN2MtvN0nnluvJQNjvtfzf6+jEALR6PqyU7fIomQQR2897pYIjCp+oTQ0la0+7lHZCmtSvmytXVa1RL6/4vNTUbJwKB0o+apqWkks8BIBQKLX2kbEE0R57Jmbu7q32aPJmfYtm81unv7zk5kk4nnwghQobPp7PiTN+dvkdT2a9Z/8rAcElglfIXFw8BQF1d3TJ2uNUkIrCXz50pChqlUyk5QEdfDjODVvhWXCJgkhhIJhJwXe/F3OzM46nJ9AtmrvTm3B4AiMVi8wZSn88dtUZlprdpc5GTOTsZ9zDxTXRZliUiEYiyitkL+J4eUx7vMHz+irJNtR23bHsWAPYdaBs3DCO4WBDFfO4AID+d20WzPJRIqc76y6NvbdtWjuMv1XWfUV5eOSiEuOd53oA/nZYAwMykafQGUl1cbKRLujQtBw93MWiHknKOoaYJAiSEAjMYVEQEJYhqFfPgwMPeq5FIhBa6OPpihR6Y0N4nmmiU4UqlHGbOCSFWCogkEUEBhgCSEMSkeNCnufeJCADU/3a8LWGaMVpoLz9TGY1GZeE/LFBg2fwA/Dc/Y0NNe6QAAAAASUVORK5CYII="><h1>AB Nutri</h1></div>
+  <nav class="nav">
+    <button class="chip active" data-tab="tab-registro">Registro</button>
+    <button class="chip" data-tab="tab-banco">Banco</button>
+    <button class="chip" data-tab="tab-auditoria">Auditoria</button>
+    <button class="chip" data-tab="tab-metabolismo">Metabolismo</button>
+  </nav>
+</header>
+<main>
+<section id="tab-registro" class="card">
+  <div class="topline">
+    <div class="row">
+      <input id="date" type="date" style="width:auto">
+      <div class="pillbar" id="meals"></div>
+    </div>
+    <div class="metaBox">
+      <div class="meta">Meta diária: <span id="metaDaily">0</span> kcal</div>
+      <div class="meta">Consumido: <span id="metaUsed">0</span> kcal</div>
+      <div class="meta">Restante: <span id="metaLeft">0</span> kcal</div>
+      <button class="btn secondary" id="gotoMeta">Recalcular Meta</button>
+    </div>
+  </div>
+  <div class="row" style="justify-content:flex-end;margin-top:8px">
+    <button class="btn secondary" id="exportDayBtn">Exportar Dia</button>
+    <button class="btn secondary" id="importDayBtn">Importar Dia</button>
+  </div>
+  <h2 style="margin-top:8px">Adicionar alimento</h2>
+  <div class="grid grid-3">
+    <div><label>Buscar</label><input id="searchFood" placeholder="Digite para filtrar…"></div>
+    <div><label>Alimento</label><select id="foodSelect"></select></div>
+    <div><label>Quantidade (g ou ml)</label><input id="qty" type="number" min="1" value="200"><div class="muted">* Banco padronizado por <b>100 g/ml</b>. Cálculo proporcional.</div></div>
+  </div>
+  <div style="margin-top:10px"><button id="addBtn" class="btn primary" style="width:100%">Adicionar ao registro</button></div>
+  <h2 style="margin-top:18px">Itens da refeição</h2>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Alimento</th><th>Qtd</th><th>Prot (g)</th><th>Carb (g)</th><th>Gord (g)</th><th>Kcal</th><th></th></tr></thead>
+      <tbody id="itemsBody"></tbody>
+      <tfoot><tr><td><b>Total</b></td><td id="tQtd">0</td><td id="tProt">0.0</td><td id="tCarb">0.0</td><td id="tFat">0.0</td><td id="tKcal">0</td><td></td></tr></tfoot>
+    </table>
+  </div>
+  <h2 style="margin-top:18px">Resumo do dia</h2>
+  <div class="summary" id="dayTotals"></div>
+</section>
+
+<section id="tab-banco" class="card hidden">
+  <div class="row" style="justify-content:space-between">
+    <div class="row" style="gap:8px">
+      <button class="btn secondary" id="addFoodBtn">+ Adicionar alimento</button>
+      <button class="btn secondary" id="exportBancoBtn">Exportar banco</button>
+      <button class="btn secondary" id="importBancoBtn">Importar banco</button>
+    </div>
+    <div class="muted" style="align-self:center">Use <b>Corrigir</b> para rótulos por 200 ml, 30 g ou unidade — eu converto para 100 g/ml.</div>
+  </div>
+  <div style="overflow-x:auto;margin-top:10px">
+    <table>
+      <thead><tr><th style="text-align:left">Alimento</th><th>Prot/100</th><th>Carb/100</th><th>Gord/100</th><th>Kcal/100</th><th></th></tr></thead>
+      <tbody id="bancoBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="tab-auditoria" class="card hidden">
+  <div class="muted">Itens possivelmente fora do padrão (ex.: P+C+G muito alto).</div>
+  <div style="overflow-x:auto;margin-top:10px">
+    <table>
+      <thead><tr><th style="text-align:left">Alimento</th><th>Motivo</th><th>Prot/100</th><th>Carb/100</th><th>Gord/100</th><th>Kcal/100</th><th></th></tr></thead>
+      <tbody id="auditBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="tab-metabolismo" class="card hidden">
+  <h2>Metabolismo e Meta</h2>
+  <div class="grid grid-4">
+    <div><label>Nome (opcional)</label><input id="m_nome" placeholder="Seu nome"></div>
+    <div><label>Sexo</label><select id="m_sexo"><option value="M">Masculino</option><option value="F">Feminino</option></select></div>
+    <div><label>Idade (anos)</label><input id="m_idade" type="number" min="10" max="100" value="30"></div>
+    <div><label>Peso (kg)</label><input id="m_peso" type="number" step="0.1" value="80"></div>
+  </div>
+  <div class="grid grid-4" style="margin-top:8px">
+    <div><label>Altura (cm)</label><input id="m_altura" type="number" value="175"></div>
+    <div><label>Esteira (km)</label><input id="m_km" type="number" step="0.1" value="0"><div class="muted">Gasto fixo: 288 kcal / km</div></div>
+    <div><label>Musculação (h)</label><input id="m_h" type="number" step="0.1" value="0"><div class="muted">Gasto fixo: 384 kcal / h</div></div>
+    <div><label>Objetivo</label><select id="m_obj"><option value="perder">Perder gordura (−800 kcal)</option><option value="manter">Manter peso</option><option value="ganhar">Ganhar massa (+500 kcal)</option></select></div>
+  </div>
+  <div class="row" style="margin-top:10px;justify-content:flex-end">
+    <button class="btn secondary" id="calcBtn">Calcular</button>
+    <button class="btn primary" id="applyBtn">Aplicar como Meta</button>
+  </div>
+  <div class="summary" style="margin-top:10px">
+    <div class="badge">TMB<br><span id="r_tmb" style="font-size:1.2rem">0</span> kcal</div>
+    <div class="badge">Esteira<br><span id="r_est" style="font-size:1.2rem">0</span> kcal</div>
+    <div class="badge">Musculação<br><span id="r_musc" style="font-size:1.2rem">0</span> kcal</div>
+    <div class="badge">TDEE<br><span id="r_tdee" style="font-size:1.2rem">0</span> kcal</div>
+    <div class="badge">Meta<br><span id="r_meta" style="font-size:1.2rem">0</span> kcal</div>
+  </div>
+</section>
+</main>
+
+<div id="modal" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Corrigir alimento</h3>
+      <button class="close" id="closeModal">Fechar</button>
+    </div>
+    <div class="grid grid-2">
+      <div><label>Nome do alimento</label><input id="f_name" placeholder="Ex.: Leite desnatado"></div>
+      <div><label>Tipo de base</label><select id="f_baseType"><option value="100g">por 100 g</option><option value="100ml">por 100 ml</option><option value="portion_g">por PORÇÃO (g)</option><option value="portion_ml">por PORÇÃO (ml)</option><option value="unit">por 1 unidade (peso em g)</option></select></div>
+    </div>
+    <div class="grid grid-3">
+      <div><label>Quantidade da base</label><input id="f_baseQty" type="number" placeholder="Ex.: 200 (ml) / 85 (g)"><div class="muted">Obrigatório quando a base não for 100 g/ml.</div></div>
+      <div><label>Proteína (g)</label><input id="f_p" type="number" step="0.01"></div>
+      <div><label>Carboidrato (g)</label><input id="f_c" type="number" step="0.01"></div>
+    </div>
+    <div class="grid grid-2">
+      <div><label>Gordura (g)</label><input id="f_f" type="number" step="0.01"></div>
+      <div><label>Kcal (opcional)</label><input id="f_k" type="number" step="0.01" placeholder="Se vazio, calculo 4/4/9"></div>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px">
+      <button class="btn secondary" id="cancelModal">Cancelar</button>
+      <button class="btn primary" id="saveModal">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const LS_FOODS="abnutri-foods-v5";
+const LS_DATA ="abnutri-data-v5";
+const LS_META ="abnutri-meta-v5";
+const MEAL_NAMES=["Café da manhã","Lanche da manhã","Almoço","Lanche da tarde","Pré-treino","Pós-treino","Jantar"];
+const kcal=(p,c,f)=>4*p+4*c+9*f;
+const $=id=>document.getElementById(id);
+const todayStr=()=>new Date().toISOString().slice(0,10);
+
+let FOODS = JSON.parse(localStorage.getItem(LS_FOODS) || "[]");
+let DATA  = JSON.parse(localStorage.getItem(LS_DATA)  || "{}");
+let META  = JSON.parse(localStorage.getItem(LS_META)  || "0");
+
+function saveFoods(){localStorage.setItem(LS_FOODS, JSON.stringify(FOODS))}
+function saveData(){localStorage.setItem(LS_DATA, JSON.stringify(DATA))}
+function saveMeta(){localStorage.setItem(LS_META, JSON.stringify(META))}
+
+document.querySelectorAll(".chip").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".chip").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const tgt=btn.dataset.tab;
+    ["tab-registro","tab-banco","tab-auditoria","tab-metabolismo"].forEach(id=>$(id).classList.toggle("hidden", id!==tgt));
+    if(tgt==="tab-banco") renderBanco();
+    if(tgt==="tab-auditoria") renderAuditoria();
+  });
+});
+
+const dateInput=$("date"); dateInput.value=todayStr();
+const mealsBar=$("meals"); let currentMeal=0;
+MEAL_NAMES.forEach((m,idx)=>{
+  const b=document.createElement("button");
+  b.className="pill"+(idx===0?" active":""); b.textContent=m;
+  b.onclick=()=>{document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentMeal=idx;renderItems();};
+  mealsBar.appendChild(b);
+});
+
+const foodSelect=$("foodSelect"), searchFood=$("searchFood"), qtyInput=$("qty"), itemsBody=$("itemsBody");
+function fillFoodSelect(filter=""){
+  const term=filter.trim().toLowerCase();
+  foodSelect.innerHTML="";
+  FOODS.forEach((f,i)=>{ if(!term || f.name.toLowerCase().includes(term)){ const o=document.createElement("option"); o.value=i; o.textContent=f.name; foodSelect.appendChild(o); }});
+  if(foodSelect.options.length===0){ const o=document.createElement("option"); o.value=""; o.textContent="(banco vazio / nenhum encontrado)"; foodSelect.appendChild(o); }
+}
+fillFoodSelect(); searchFood.addEventListener("input",e=>fillFoodSelect(e.target.value));
+
+$("addBtn").addEventListener("click",()=>{
+  const idx=parseInt(foodSelect.value,10);
+  const qtd=parseFloat(qtyInput.value);
+  if(isNaN(idx) || !isFinite(qtd) || qtd<=0){alert("Selecione um alimento e informe a quantidade.");return;}
+  const f=FOODS[idx], factor=qtd/100;
+  const it={name:f.name, qty:qtd, p:f.p*factor, c:f.c*factor, f:f.f*factor, k:kcal(f.p,f.c,f.f)*factor};
+  const key=dateInput.value;
+  if(!DATA[key]) DATA[key]={};
+  if(!DATA[key][currentMeal]) DATA[key][currentMeal]=[];
+  DATA[key][currentMeal].push(it); saveData();
+  renderItems(); renderDayTotals(); renderMetaHeader();
+});
+
+function removeItem(i){
+  const key=dateInput.value; if(!DATA[key]||!DATA[key][currentMeal])return;
+  DATA[key][currentMeal].splice(i,1); saveData(); renderItems(); renderDayTotals(); renderMetaHeader();
+}
+window.removeItem=removeItem;
+
+dateInput.addEventListener("change",()=>{renderItems(); renderDayTotals(); renderMetaHeader();});
+
+function getMealItems(){ const key=dateInput.value; return (DATA[key] && DATA[key][currentMeal]) ? DATA[key][currentMeal] : []; }
+
+function renderItems(){
+  const arr=getMealItems();
+  itemsBody.innerHTML = arr.map((r,i)=>`
+    <tr>
+      <td style="text-align:left">${r.name}</td>
+      <td>${r.qty}</td><td>${r.p.toFixed(1)}</td><td>${r.c.toFixed(1)}</td><td>${r.f.toFixed(1)}</td><td>${r.k.toFixed(0)}</td>
+      <td><button class="btn secondary" onclick="removeItem(${i})">Remover</button></td>
+    </tr>`).join("");
+  const s=arr.reduce((a,r)=>({q:a.q+r.qty,p:a.p+r.p,c:a.c+r.c,f:a.f+r.f,k:a.k+r.k}),{q:0,p:0,c:0,f:0,k:0});
+  $("tQtd").textContent=s.q.toFixed(0); $("tProt").textContent=s.p.toFixed(1);
+  $("tCarb").textContent=s.c.toFixed(1); $("tFat").textContent=s.f.toFixed(1); $("tKcal").textContent=s.k.toFixed(0);
+}
+
+function totalsForDate(key){
+  const map=DATA[key]||{};
+  return Object.values(map).flat().reduce((a,r)=>({p:a.p+r.p,c:a.c+r.c,f:a.f+r.f,k:a.k+r.k}),{p:0,c:0,f:0,k:0});
+}
+function renderDayTotals(){
+  const key=dateInput.value; const t=totalsForDate(key);
+  $("dayTotals").innerHTML=`
+    <div class="badge">Proteína<br><span style="font-size:1.2rem">${t.p.toFixed(1)} g</span></div>
+    <div class="badge">Carboidrato<br><span style="font-size:1.2rem">${t.c.toFixed(1)} g</span></div>
+    <div class="badge">Gordura<br><span style="font-size:1.2rem">${t.f.toFixed(1)} g</span></div>
+    <div class="badge">Calorias<br><span style="font-size:1.2rem">${t.k.toFixed(0)} kcal</span></div>`;
+}
+function renderMetaHeader(){
+  const key=dateInput.value; const t=totalsForDate(key);
+  const meta=parseFloat(META)||0;
+  const used=t.k||0;
+  const left=Math.max(0, meta - used);
+  $("metaDaily").textContent=Math.round(meta);
+  $("metaUsed").textContent=Math.round(used);
+  $("metaLeft").textContent=Math.round(left);
+}
+renderItems(); renderDayTotals(); renderMetaHeader();
+
+$("gotoMeta").addEventListener("click",()=>{
+  document.querySelector('[data-tab="tab-metabolismo"]').click();
+});
+
+$("exportDayBtn").addEventListener("click",()=>{
+  const key=dateInput.value, payload=DATA[key]||{};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`ABNutri_${key}.json`; a.click();
+});
+$("importDayBtn").addEventListener("click",()=>{
+  const i=document.createElement("input"); i.type="file"; i.accept="application/json";
+  i.onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=ev=>{
+      try{ const obj=JSON.parse(ev.target.result); const key=dateInput.value; DATA[key]=obj; saveData(); renderItems(); renderDayTotals(); renderMetaHeader(); alert("Dia importado!"); }
+      catch(err){ alert("Erro ao importar: "+err.message) }
+    }; r.readAsText(f);
+  }; i.click();
+});
+
+const bancoBody=$("bancoBody");
+function renderBanco(){
+  bancoBody.innerHTML = (FOODS.length?FOODS:[{name:"(banco vazio — importe para começar)",p:0,c:0,f:0}]).map((f,i)=>`
+    <tr>
+      <td style="text-align:left">${f.name}</td>
+      <td>${(f.p||0).toFixed(2)}</td>
+      <td>${(f.c||0).toFixed(2)}</td>
+      <td>${(f.f||0).toFixed(2)}</td>
+      <td>${Math.round(kcal(f.p||0,f.c||0,f.f||0))}</td>
+      <td>${FOODS.length?`<button class="btn primary" onclick="openModal(${i})">Corrigir</button>`:""}</td>
+    </tr>`).join("");
+}
+$("addFoodBtn").addEventListener("click",()=>openModal(null));
+
+$("exportBancoBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(FOODS,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="banco_abnutri.json"; a.click();
+});
+$("importBancoBtn").addEventListener("click",()=>{
+  const i=document.createElement("input"); i.type="file"; i.accept="application/json";
+  i.onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        let parsed=JSON.parse(ev.target.result);
+        if(Array.isArray(parsed)){
+          FOODS = parsed.filter(x=>x && x.name && typeof x.p==="number" && typeof x.c==="number" && typeof x.f==="number");
+        }else{
+          FOODS = Object.entries(parsed).map(([name,v])=>{
+            const base = typeof v.base==="number" && v.base>0 ? v.base : 100;
+            const factor = 100/base;
+            return {name, p:(v.prot||v.p||0)*factor, c:(v.carb||v.c||0)*factor, f:(v.gord||v.f||0)*factor};
+          });
+        }
+        saveFoods(); fillFoodSelect($("searchFood").value); renderBanco(); renderAuditoria(); alert("Banco importado!");
+      }catch(err){ alert("Erro ao importar: "+err.message) }
+    }; r.readAsText(f);
+  }; i.click();
+});
+
+const auditBody=$("auditBody");
+function auditReasons(f){
+  const reasons=[];
+  if(((f.p||0)+(f.c||0)+(f.f||0))>120) reasons.push("P+C+G > 120 (suspeito)");
+  if([f.p,f.c,f.f].some(x=>x<0)) reasons.push("macro negativo");
+  return reasons;
+}
+function renderAuditoria(){
+  const rows=[];
+  FOODS.forEach((f,i)=>{
+    const r=auditReasons(f);
+    if(r.length) rows.push(`
+      <tr>
+        <td style="text-align:left">${f.name}</td>
+        <td>${r.join(", ")}</td>
+        <td>${(f.p||0).toFixed(2)}</td><td>${(f.c||0).toFixed(2)}</td><td>${(f.f||0).toFixed(2)}</td>
+        <td>${Math.round(kcal(f.p||0,f.c||0,f.f||0))}</td>
+        <td><button class="btn primary" onclick="openModal(${i})">Corrigir</button></td>
+      </tr>`);
+  });
+  auditBody.innerHTML = rows.join("") || `<tr><td colspan="7" class="muted">Sem suspeitas.</td></tr>`;
+}
+
+const modal=$("modal"), mTitle=$("modalTitle");
+const f_name=$("f_name"), f_baseType=$("f_baseType"), f_baseQty=$("f_baseQty"), f_p=$("f_p"), f_c=$("f_c"), f_f=$("f_f"), f_k=$("f_k");
+let editingIndex=null;
+
+function openModal(index){
+  editingIndex=index;
+  if(index===null){
+    mTitle.textContent="Adicionar alimento";
+    f_name.value=""; f_baseType.value="100g"; f_baseQty.value=""; f_p.value=""; f_c.value=""; f_f.value=""; f_k.value="";
+  }else{
+    const f=FOODS[index];
+    mTitle.textContent="Corrigir: "+f.name;
+    f_name.value=f.name; f_baseType.value="100g"; f_baseQty.value=100; f_p.value=f.p; f_c.value=f.c; f_f.value=f.f; f_k.value=Math.round(kcal(f.p,f.c,f.f));
+  }
+  modal.classList.add("open");
+}
+function closeModal(){ modal.classList.remove("open"); }
+$("closeModal").onclick=closeModal; $("cancelModal").onclick=closeModal;
+
+function toPer100(baseType,baseQty,P,C,F){
+  if(!(baseType==="100g"||baseType==="100ml")){ if(!isFinite(baseQty)||baseQty<=0) throw new Error("Informe a quantidade da base."); }
+  else baseQty=100;
+  const factor=100/baseQty;
+  return {p:(+P||0)*factor, c:(+C||0)*factor, f:(+F||0)*factor};
+}
+
+$("saveModal").addEventListener("click",()=>{
+  try{
+    const name=(f_name.value||"").trim(); if(!name) return alert("Informe o nome.");
+    const {p,c,f}=toPer100(f_baseType.value, +f_baseQty.value, +f_p.value, +f_c.value, +f_f.value);
+    const rec={name, p, c, f};
+    if(editingIndex===null) FOODS.push(rec); else FOODS[editingIndex]=rec;
+    saveFoods(); fillFoodSelect($("searchFood").value); renderBanco(); renderAuditoria(); closeModal();
+  }catch(err){ alert("Não foi possível salvar: "+err.message) }
+});
+
+function calcTMB(sexo, idade, peso, altura){
+  const base = 10*peso + 6.25*altura - 5*idade + (sexo==="M"?5:-161);
+  return Math.max(0, base);
+}
+function calcGastos(km, h){
+  const esteira = 288 * (km||0);
+  const musc    = 384 * (h||0);
+  return {esteira, musc};
+}
+function calcMeta(obj, tdee){
+  if(obj==="perder") return tdee - 800;
+  if(obj==="ganhar") return tdee + 500;
+  return tdee;
+}
+
+function readFields(){
+  return {
+    nome: ($("m_nome").value||"").trim(),
+    sexo: $("m_sexo").value,
+    idade: +$("m_idade").value || 0,
+    peso: +$("m_peso").value || 0,
+    altura: +$("m_altura").value || 0,
+    km: +$("m_km").value || 0,
+    h: +$("m_h").value || 0,
+    obj: $("m_obj").value
+  };
+}
+
+function computeAndRender(){
+  const v=readFields();
+  const tmb = calcTMB(v.sexo, v.idade, v.peso, v.altura);
+  const g = calcGastos(v.km, v.h);
+  const tdee = tmb + g.esteira + g.musc;
+  const meta = calcMeta(v.obj, tdee);
+  $("r_tmb").textContent=Math.round(tmb);
+  $("r_est").textContent=Math.round(g.esteira);
+  $("r_musc").textContent=Math.round(g.musc);
+  $("r_tdee").textContent=Math.round(tdee);
+  $("r_meta").textContent=Math.round(meta);
+  return {meta};
+}
+
+$("calcBtn").addEventListener("click",computeAndRender);
+$("applyBtn").addEventListener("click",()=>{
+  const r=computeAndRender();
+  META = Math.max(0, r.meta);
+  saveMeta();
+  alert("Meta aplicada ao Registro!");
+  document.querySelector('[data-tab="tab-registro"]').click();
+  renderMetaHeader();
+});
+</script>
+</body>
+</html>
