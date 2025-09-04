@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AB Nutri</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" href="icon-192.png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fafafa; }
+    header { background: #111; color: #fff; padding: 12px; text-align: center; }
+    .container { padding: 16px; max-width: 960px; margin: auto; }
+    .card { background: #fff; padding: 16px; margin-bottom: 16px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.1); }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid #eee; font-size: 14px; }
+    th { background: #f0f0f0; }
+    button { padding: 8px 12px; border: none; border-radius: 8px; cursor: pointer; }
+    button.primary { background: #111; color: #fff; }
+    button.secondary { background: #eee; color: #111; }
+    .pill { display:inline-block; padding:6px 10px; border-radius:20px; border:1px solid #ccc; margin:2px; cursor:pointer; }
+    .pill.active { background:#111; color:#fff; }
+    .totals { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .chip { background:#f0f0f0; padding:6px 10px; border-radius:12px; font-weight:bold; }
+  </style>
+</head>
+<body>
+<header><h1>AB Nutri</h1></header>
+<div class="container">
+  <div class="card">
+    <label>Data</label>
+    <input type="date" id="datePicker"><br><br>
+    <label>Refeição</label>
+    <div id="mealPills"></div>
+  </div>
+  <div class="card">
+    <label>Buscar alimento</label>
+    <input id="search"><br><br>
+    <label>Alimento</label>
+    <select id="foodSelect"></select><br><br>
+    <label>Quantidade (g ou ml)</label>
+    <input type="number" id="qty" value="100"><br><br>
+    <button class="primary" id="addBtn">Adicionar</button>
+  </div>
+  <div class="card">
+    <h3>Itens da refeição</h3>
+    <table id="itemsTable">
+      <thead><tr><th>Alimento</th><th>Qtd</th><th>Prot</th><th>Carb</th><th>Gord</th><th>Kcal</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Resumo do dia</h3>
+    <div class="totals" id="dayTotals"></div>
+  </div>
+</div>
+
+<script>
+const MEALS = ["Café da manhã","Lanche da manhã","Almoço","Lanche da tarde","Pré-treino","Pós-treino","Jantar"];
+let FOODS = [];
+let state = { date: new Date().toISOString().slice(0,10), meal: MEALS[0], data: JSON.parse(localStorage.getItem("nutri-data")||"{}") };
+
+fetch("foods.json").then(r=>r.json()).then(data=>{ FOODS=data; populateFoods(); renderTable(); renderDayTotals(); });
+
+function save(){ localStorage.setItem("nutri-data", JSON.stringify(state.data)); }
+function ensurePath(){ if(!state.data[state.date]) state.data[state.date] = {}; if(!state.data[state.date][state.meal]) state.data[state.date][state.meal]=[]; }
+
+function renderMeals(){
+  const el=document.getElementById("mealPills");
+  el.innerHTML = MEALS.map(m=>"<span class='pill "+(m===state.meal?"active":"")+"' onclick='selectMeal(""+m+"")'>"+m+"</span>").join("");
+}
+function selectMeal(m){ state.meal=m; renderMeals(); renderTable(); }
+
+function populateFoods(q=""){
+  const sel=document.getElementById("foodSelect");
+  const list = q? FOODS.filter(f=>f.name.toLowerCase().includes(q.toLowerCase())):FOODS;
+  sel.innerHTML=list.map(f=>"<option>"+f.name+"</option>").join("");
+}
+
+function calc(f,qty){ let factor=qty/100; return { protein:(f.protein*factor).toFixed(1), carbs:(f.carbs*factor).toFixed(1), fat:(f.fat*factor).toFixed(1), kcal:(f.kcal*factor).toFixed(0) }; }
+
+function addItem(){
+  const name=document.getElementById("foodSelect").value; const qty=parseFloat(document.getElementById("qty").value)||0;
+  if(!name||!qty) return;
+  const f=FOODS.find(x=>x.name===name); if(!f) return;
+  ensurePath();
+  const vals=calc(f,qty);
+  state.data[state.date][state.meal].push({name, qty, ...vals});
+  save(); renderTable(); renderDayTotals();
+}
+function removeItem(i){ ensurePath(); state.data[state.date][state.meal].splice(i,1); save(); renderTable(); renderDayTotals(); }
+
+function renderTable(){
+  ensurePath();
+  const rows=state.data[state.date][state.meal];
+  const tb=document.querySelector("#itemsTable tbody");
+  tb.innerHTML=rows.map((r,i)=>"<tr><td>"+r.name+"</td><td>"+r.qty+"</td><td>"+r.protein+"</td><td>"+r.carbs+"</td><td>"+r.fat+"</td><td>"+r.kcal+"</td><td><button class='secondary' onclick='removeItem("+i+")'>X</button></td></tr>").join("");
+}
+
+function renderDayTotals(){
+  const day=state.data[state.date]||{}; let totals={protein:0,carbs:0,fat:0,kcal:0};
+  for(const m of Object.keys(day)){ for(const it of day[m]){ totals.protein+=+it.protein; totals.carbs+=+it.carbs; totals.fat+=+it.fat; totals.kcal+=+it.kcal; } }
+  document.getElementById("dayTotals").innerHTML = "<div class='chip'>Proteína: "+totals.protein.toFixed(1)+" g</div><div class='chip'>Carbo: "+totals.carbs.toFixed(1)+" g</div><div class='chip'>Gord: "+totals.fat.toFixed(1)+" g</div><div class='chip'>Kcal: "+totals.kcal.toFixed(0)+"</div>";
+}
+
+document.getElementById("datePicker").value=state.date;
+document.getElementById("datePicker").addEventListener("change",e=>{state.date=e.target.value; renderTable(); renderDayTotals();});
+document.getElementById("addBtn").addEventListener("click",addItem);
+document.getElementById("search").addEventListener("input",e=>populateFoods(e.target.value));
+
+renderMeals();
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
+</script>
+</body>
+</html>
